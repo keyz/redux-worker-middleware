@@ -10,25 +10,25 @@ npm install --save redux-worker-middleware
 
 The goal of the middleware is to provide an unopinionated workflow that delegates expensive operations to Web Workers. Thus, please notice that this middleware **doesn't** wrap, transform, or shim Web Workers. 
 
-In case you need, Webpack's [worker-loader](https://github.com/webpack/worker-loader) is an out of box solution for that. 
+In case you need, webpack's [worker-loader](https://github.com/webpack/worker-loader) is an out of box solution for that. 
 
 ## ~~API~~ How it works
 `redux-worker-middleware` exports a single (default) function `createWorkerMiddleware`. Here are the steps to set it up:
 
 1. Pass it a Web Worker instance and put the returned (curried) function in the middleware chain. 
     - Notice that your worker should have the signature of `Action -> Action`; that is, it always takes a complete action and returns a complete action, which can be dispatched right away. It makes the API much simpler. 
-    - Need to partially update the payload? Sure, just let your worker handle the logic!
+    - Need to partially update the payload? Sure, just let your worker handle the logic! It has to work anyway.
 
-2. To let the workers work, make sure that your action is [FSA compliant](https://github.com/acdlite/flux-standard-action) and `action.meta.WebWorker` is truthy. Otherwise, the middleware will just pass the action along.
+2. To let the workers work, make sure that your action is [FSA compliant](https://github.com/acdlite/flux-standard-action) and the `action.meta.WebWorker` field is truthy. Otherwise, the middleware will just pass the action along.
 
 3. If an action specifies that it needs to be processed by a worker, The middleware will obey the order. Then when the data comes back, it will be passed along to the rest of the middleware chain.
 
 ## Demo
-I wrote this middleware while developing https://github.com/keyanzhang/repo.cat, where I need to parse a lot of markdown stuff to HTML at runtime. So a real demo can be found there: the Web Worker related part lives in @TODO, @TODO, and @TODO.
+I wrote this middleware as part of https://github.com/keyanzhang/repo.cat, where I need to parse a lot of markdown stuff to HTML at runtime. So the real demo can be found there: the Web Worker related part lives in [`actions/DataFetching.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/actions/DataFetching.js), [`middlewares/worker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/middlewares/worker.js), and [`workers/GFMParserWorker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/workers/GFMParserWorker.js).
 
 A minimal example can be found as below:
 
-`Add1Worker.js`:
+Web Worker: `Add1Worker.js`:
 ```javascript
 self.onmessage = ({ data: action }) => { // data should be a FSA compliant action object.
   self.postMessage({
@@ -40,13 +40,53 @@ self.onmessage = ({ data: action }) => { // data should be a FSA compliant actio
 };
 ```
 
-@TODO
+ActionCreator: 
+```javascript
+export const add1Action = (n) => ({
+  type: 'ADD_1',
+  meta: {
+    WebWorker: true, // this line specifies that the worker should show up and do the job
+  },
+  payload: {
+    num: n,
+  },
+});
+```
+
+Then in your store configuration,
+```javascript
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import createWorkerMiddleware from 'redux-worker-middleware';
+
+import * as reducers from '../reducers';
+import {
+  logger,
+  thunk,
+} from '../middlewares';
+
+const Add1Worker = require('worker!../workers/Add1Worker'); // webpack's worker-loader
+const add1Worker = new Add1Worker;
+
+const workerMiddleware = createWorkerMiddleware(parserWorker);
+
+const rootReducer = combineReducers(reducers);
+
+const createStoreWithMiddleware = applyMiddleware(
+  workerMiddleware,
+  thunk,
+  logger,
+)(createStore);
+
+// ... ...
+```
+
+That's it! Now when you fire an `add1Action`, the worker will show up and do the computation. The result (action) will be passed along to the next middleware.
 
 ## Notes
 
-For now, we don't really care if you actually pass it a real Worker instance; as long as it look likes a Worker and works like a Worker (i.e., has a `postMessage` method), it _is_ a Worker. 
+For now, we don't really care if you actually pass it a real Worker instance; as long as it look likes a Worker and works like a Worker (i.e., has a `postMessage` method), it _is_ a Worker. Take a look at the test cases [here](./test/__setup__/workerPolyfill.js).
 
-The reason behind is that we want to support WebWorker shims in an easy manner, although it doesn't make a lot of sense. (One may argue that using IE <= 9 makes negative sense. I agree with that :wink:)
+The reason behind is that we want to support Web Worker shims in an easy manner, although it doesn't make a lot of sense. (One may argue that using IE <= 9 makes negative sense. I agree with that :wink:)
 
 ## License
 MIT
