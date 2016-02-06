@@ -20,3 +20,5 @@ addons:
 
 before_install:
   - npm install -g babel-cli
+
+after_success: npm run cov
