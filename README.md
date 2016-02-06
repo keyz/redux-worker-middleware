@@ -27,7 +27,7 @@ In case you need, webpack's [worker-loader](https://github.com/webpack/worker-lo
 3. If an action specifies that it needs to be processed by a worker, The middleware will obey the order. Then when the data comes back, it will be passed along to the rest of the middleware chain.
 
 ## Demo
-I wrote this middleware as part of https://github.com/keyanzhang/repo.cat, where I need to parse a lot of markdown stuff to HTML at runtime. So the real demo can be found there: the Web Worker related part lives in [`actions/DataFetching.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/actions/DataFetching.js), [`middlewares/worker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/middlewares/worker.js), and [`workers/GFMParserWorker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/workers/GFMParserWorker.js).
+I wrote this middleware as part of https://github.com/keyanzhang/repo.cat, where I need to parse a lot of markdown stuff to HTML at runtime. So the real demo can be found there: the Web Worker related parts live in [`actions/DataFetching.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/actions/DataFetching.js), [`middlewares/worker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/middlewares/worker.js), and [`workers/GFMParserWorker.js`](https://github.com/keyanzhang/repo.cat/blob/master/src/workers/GFMParserWorker.js).
 
 A minimal example can be found as below:
 
@@ -87,9 +87,7 @@ That's it! Now when you fire an `add1Action`, the worker will show up and do the
 
 ## Notes
 
-For now, we don't really care if you actually pass it a real Worker instance; as long as it look likes a Worker and works like a Worker (i.e., has a `postMessage` method), it _is_ a Worker. Take a look at the test cases [here](./test/__setup__/workerPolyfill.js).
-
-The reason behind is that we want to support Web Worker shims in an easy manner, although it doesn't make a lot of sense. (One may argue that using IE <= 9 makes negative sense. I agree with that :wink:)
+For now, we don't really care if you actually pass it a real Worker instance; as long as it look likes a Worker and works like a Worker (i.e., has a `postMessage` method), it _is_ a Worker. The reason behind is that we want to support Web Worker shims in an easy manner. Take a look at the test cases [here](./test/__setup__/workerPolyfill.js).
 
 ## License
 MIT
