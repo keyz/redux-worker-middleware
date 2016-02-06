@@ -1,3 +1,7 @@
+/*
+  Worker is polyfilled by the implementation at `./__setup__/workerPolyfill`.
+*/
+
 import expect, { createSpy, spyOn, restoreSpies } from 'expect';
 
 import createWorkerMiddleware from '../src';
@@ -5,7 +9,9 @@ import createWorkerMiddleware from '../src';
 describe('createWorkerMiddleware', () => {
   const actionWithWorker = {
     type: 'I_USE_WORKER',
-    WebWorker: true,
+    meta: {
+      WebWorker: true,
+    },
     payload: {
       data: 42,
       category: 'life',

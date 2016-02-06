@@ -43,7 +43,7 @@ const createWorkerMiddleware = (worker) => {
       nextPool.next = next;
     }
 
-    if (action.WebWorker) {
+    if (action.meta && action.meta.WebWorker) {
       worker.postMessage(action);
     } else {
       return next(action);
