@@ -1,4 +1,6 @@
-# Redux Worker Middleware [![build status](https://img.shields.io/travis/keyanzhang/redux-worker-middleware/master.svg?style=flat-square)](https://travis-ci.org/keyanzhang/redux-worker-middleware)
+# Redux Worker Middleware
+[![build status](https://img.shields.io/travis/keyanzhang/redux-worker-middleware/master.svg?style=flat-square)](https://travis-ci.org/keyanzhang/redux-worker-middleware)
+[![test coverage](https://img.shields.io/coveralls/keyanzhang/redux-worker-middleware/master.svg?style=flat-square)](https://coveralls.io/github/keyanzhang/redux-worker-middleware?branch=master)
 
 Redux + Web Workers = :boom: :construction_worker:
 
@@ -8,15 +10,15 @@ npm install --save redux-worker-middleware
 
 ## Intro
 
-The goal of the middleware is to provide an unopinionated workflow that delegates expensive operations to Web Workers. Thus, please notice that this middleware **doesn't** wrap, transform, or shim Web Workers. 
+The goal of the middleware is to provide an unopinionated workflow that delegates expensive operations to Web Workers. Thus, please notice that this middleware **doesn't** wrap, transform, or shim Web Workers.
 
-In case you need, webpack's [worker-loader](https://github.com/webpack/worker-loader) is an out of box solution for that. 
+In case you need, webpack's [worker-loader](https://github.com/webpack/worker-loader) is an out of box solution for that.
 
 ## ~~API~~ How it works
 `redux-worker-middleware` exports a single (default) function `createWorkerMiddleware`. Here are the steps to set it up:
 
-1. Pass it a Web Worker instance and put the returned (curried) function in the middleware chain. 
-    - Notice that your worker should have the signature of `Action -> Action`; that is, it always takes a complete action and returns a complete action, which can be dispatched right away. It makes the API much simpler. 
+1. Pass it a Web Worker instance and put the returned (curried) function in the middleware chain.
+    - Notice that your worker should have the signature of `Action -> Action`; that is, it always takes a complete action and returns a complete action, which can be dispatched right away. It makes the API much simpler.
     - Need to partially update the payload? Sure, just let your worker handle the logic! It has to work anyway.
 
 2. To let the workers work, make sure that your action is [FSA compliant](https://github.com/acdlite/flux-standard-action) and the `action.meta.WebWorker` field is truthy. Otherwise, the middleware will just pass the action along.
@@ -40,7 +42,7 @@ self.onmessage = ({ data: action }) => { // data should be a FSA compliant actio
 };
 ```
 
-ActionCreator: 
+ActionCreator:
 ```javascript
 export const add1Action = (n) => ({
   type: 'ADD_1',
