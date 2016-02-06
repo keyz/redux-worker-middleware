@@ -1,7 +1,7 @@
 {
   "name": "redux-worker-middleware",
   "version": "0.1.0",
-  "description": "",
+  "description": "Organized Web Workers for Redux",
   "main": "lib/index.js",
   "files": [
     "lib",
@@ -22,7 +22,12 @@
   },
   "keywords": [
     "redux",
-    "middleware"
+    "middleware",
+    "webworkers",
+    "webworker",
+    "worker",
+    "react",
+    "flux"
   ],
   "author": "Keyan Zhang <root@keyanzhang.com> (http://keya.nz)",
   "license": "MIT",
