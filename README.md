@@ -1,6 +1,7 @@
 # Redux Worker Middleware
 [![build status](https://img.shields.io/travis/keyanzhang/redux-worker-middleware/master.svg?style=flat-square)](https://travis-ci.org/keyanzhang/redux-worker-middleware)
 [![test coverage](https://img.shields.io/coveralls/keyanzhang/redux-worker-middleware/master.svg?style=flat-square)](https://coveralls.io/github/keyanzhang/redux-worker-middleware?branch=master)
+[![npm version](https://img.shields.io/npm/v/redux-worker-middleware.svg?style=flat-square)](https://www.npmjs.com/package/redux-worker-middleware)
 
 Redux + Web Workers = :boom: :construction_worker:
 
