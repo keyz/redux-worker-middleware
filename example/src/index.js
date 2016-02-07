@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
-import ChatHeads from './components/ChatHeads';
+import Main from './components/Main';
 
 render(
-  <ChatHeads />,
+  <Main />,
   document.getElementById('root'),
 );
