@@ -1,14 +1,24 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ChatHeads from './ChatHeads';
 import Computations from './Computations';
+import topConnector from './topConnector';
 
-export default class Main extends Component {
+class Main extends Component {
+  static propTypes = {
+    num: PropTypes.number.isRequired,
+    normalCalcValue: PropTypes.func.isRequired,
+    asyncCalcValue: PropTypes.func.isRequired,
+    workerCalcValue: PropTypes.func.isRequired,
+  };
+
   render() {
     return (
       <div>
         <ChatHeads />
-        <Computations />
+        <Computations {...this.props} />
       </div>
     );
   }
 }
+
+export default topConnector(Main);

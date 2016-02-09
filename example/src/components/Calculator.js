@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 export default class Calculator extends Component {
   static propTypes = {
     times: PropTypes.number.isRequired,
+    type: PropTypes.string.isRequired,
+    onRun: PropTypes.func.isRequired,
   };
 
   state = {
@@ -10,11 +12,13 @@ export default class Calculator extends Component {
   };
 
   render() {
-    const { times } = this.props;
+    const { times, type, onRun } = this.props;
+    const onRunThunk = () => onRun(times);
 
     return (
       <div>
-        {times}
+        {type} calculator:
+        <button onClick={onRunThunk}>run</button>
       </div>
     );
   }

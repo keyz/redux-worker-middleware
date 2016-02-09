@@ -4,11 +4,14 @@ import Calculator from './Calculator';
 
 export default class Computations extends Component {
   static propTypes = {
-
+    num: PropTypes.number.isRequired,
+    normalCalcValue: PropTypes.func.isRequired,
+    asyncCalcValue: PropTypes.func.isRequired,
+    workerCalcValue: PropTypes.func.isRequired,
   };
 
   state = {
-    times: 1000000,
+    times: 2000000000,
   };
 
   handleInput = (evt) => {
@@ -21,18 +24,37 @@ export default class Computations extends Component {
 
   render() {
     const { times } = this.state;
+    const {
+      num,
+      normalCalcValue,
+      asyncCalcValue,
+      workerCalcValue,
+    } = this.props;
 
     return (
       <div>
+        { `current result = ${num}. ` }
         { 'Let\'s run a loop for n times where n = ' }
         <input
           type="number"
           value={times}
           onChange={this.handleInput}
         />
-        <Calculator times={times}/>
-        <Calculator times={times}/>
-        <Calculator times={times}/>
+        <Calculator
+          times={times}
+          type={'normal'}
+          onRun={normalCalcValue}
+        />
+        <Calculator
+          times={times}
+          type={'async'}
+          onRun={asyncCalcValue}
+        />
+        <Calculator
+          times={times}
+          type={'worker'}
+          onRun={workerCalcValue}
+        />
       </div>
     );
   }

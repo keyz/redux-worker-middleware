@@ -3,7 +3,8 @@
   "version": "0.1.2",
   "private": true,
   "scripts": {
-    "start": "node devServer.js"
+    "start": "node devServer.js",
+    "lint": "eslint src"
   },
   "keywords": [],
   "author": "Keyan Zhang <root@keyanzhang.com> (http://keya.nz)",
