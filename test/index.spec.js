@@ -30,12 +30,10 @@ describe('createWorkerMiddleware', () => {
     restoreSpies();
   });
 
-  it('should yell and throw if `worker` is falsy', () => {
+  it('should yell if `worker` is falsy', () => {
     const consoleErrSpy = spyOn(console, 'error');
 
-    expect(() => {
-      createWorkerMiddleware();
-    }).toThrow('Cannot set property \'onmessage\' of undefined');
+    createWorkerMiddleware();
 
     expect(consoleErrSpy).toHaveBeenCalledWith(
       'Fatal: `worker` is falsy.'
