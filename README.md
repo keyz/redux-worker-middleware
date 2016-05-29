@@ -70,7 +70,7 @@ import {
 const Add1Worker = require('worker!../workers/Add1Worker'); // webpack's worker-loader
 const add1Worker = new Add1Worker;
 
-const workerMiddleware = createWorkerMiddleware(parserWorker);
+const workerMiddleware = createWorkerMiddleware(add1Worker);
 
 const rootReducer = combineReducers(reducers);
 
