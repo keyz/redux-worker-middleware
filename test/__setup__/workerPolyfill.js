@@ -1,17 +1,13 @@
-import { idFn } from '../utils';
-
 export class Worker {
-  constructor(fn = idFn) {
+  constructor(fn = () => (3)) {
     this.fn = fn;
   }
 
   postMessage = (msg) => {
-    if (this.onmessage) {
-      setTimeout(() => {
-        const data = this.fn(msg);
-        this.onmessage({ data });
-      }, 0);
-    }
+    setTimeout(() => {
+      const data = this.fn(msg);
+      this.onmessage({ data });
+    }, 5);
   };
 
   onmessage = undefined;

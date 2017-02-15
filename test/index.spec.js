@@ -26,8 +26,11 @@ describe('createWorkerMiddleware', () => {
     },
   };
 
+  const dispatch = createSpy();
+
   afterEach(() => {
     restoreSpies();
+    dispatch.reset();
   });
 
   it('should yell if `worker` is falsy', () => {
@@ -51,20 +54,28 @@ describe('createWorkerMiddleware', () => {
 
     const middleware = createWorkerMiddleware({});
     expect(() => {
-      middleware()(next)(actionWithWorker);
+      middleware({ dispatch })(next)(actionWithWorker);
     }).toThrow('worker.postMessage is not a function');
   });
 
   it('the worker must be invoked if the action needs it', (done) => {
     const spyWorkerBehavior = createSpy();
+    const spyWorker = new window.Worker(spyWorkerBehavior);
+    // const postMessageSpy = spyOn(spyWorker, 'postMessage');
 
-    const next = () => {
-      expect(spyWorkerBehavior).toHaveBeenCalled();
-      done();
+    const makeNext = (action) => (newAction) => {
+      // expect(postMessageSpy).toHaveBeenCalledWith(actionWithWorker);
+      expect(newAction).toEqual(action);
+      setTimeout(() => {
+        expect(spyWorkerBehavior).toHaveBeenCalled();
+        done();
+      }, 10);
     };
 
-    const middleware = createWorkerMiddleware(new window.Worker(spyWorkerBehavior));
-    middleware()(next)(actionWithWorker);
+    const next = makeNext(actionWithWorker);
+
+    const middleware = createWorkerMiddleware(spyWorker);
+    middleware({ dispatch })(next)(actionWithWorker);
   });
 
   it('the worker shouldn\'t be invoked if the action doesn\'t need it', (done) => {
@@ -76,36 +87,41 @@ describe('createWorkerMiddleware', () => {
     };
 
     const middleware = createWorkerMiddleware(new window.Worker(spyWorkerBehavior));
-    middleware()(next)(actionWithoutWorker);
+    middleware({ dispatch })(next)(actionWithoutWorker);
   });
 
-  it('when the action needs a worker, it should eventually pass an action to ' +
-     '`dispatch` or the next middleware after the worker finishes processing', (done) => {
-    const makeNext = (oldAction) => (newAction) => {
-      expect(newAction).toBe(oldAction);
-      done();
+  it('when the action needs a worker, it should pass along the action with ' +
+    '`next` so that the next middleware in the chain sees it', (done) => {
+    const makeNext = (action) => (newAction) => {
+      expect(newAction).toBe(action);
+      setTimeout(() => {
+        expect(dispatch).toHaveBeenCalledWith(3);
+        done();
+      }, 10);
     };
 
     const next = makeNext(actionWithWorker);
 
     const middleware = createWorkerMiddleware(new window.Worker());
-    middleware()(next)(actionWithWorker);
+    middleware({ dispatch })(next)(actionWithWorker);
   });
 
-  it('when the action doesn\'t need a worker, it should directly pass an action to ' +
-     '`dispatch` or the next middleware without modifying it', (done) => {
-    const makeNext = (oldAction) => (newAction) => {
-      expect(newAction).toBe(oldAction);
+  it('when the action doesn\'t need a worker, it should also pass along the action with ' +
+    '`next` so that the next middleware in the chain sees it', (done) => {
+    const makeNext = (action) => (newAction) => {
+      expect(newAction).toBe(action);
       done();
     };
 
     const next = makeNext(actionWithoutWorker);
 
     const middleware = createWorkerMiddleware(new window.Worker());
-    middleware()(next)(actionWithoutWorker);
+    middleware({ dispatch })(next)(actionWithoutWorker);
+    expect(dispatch).toNotHaveBeenCalled();
   });
 
-  it('should return a correct result if the action needs a worker', (done) => {
+  it('when the action needs a worker, it should still pass along the action with ' +
+    '`next`, and it should dipsatch the action returned from the worker', (done) => {
     const workerBehavior = (action) => ({
       ...action,
       payload: {
@@ -115,14 +131,18 @@ describe('createWorkerMiddleware', () => {
       },
     });
 
-    const makeNext = (oldAction) => (newAction) => {
-      expect(newAction).toEqual(workerBehavior(oldAction));
-      done();
+    const spyDispatch = (action) => (dispatchedAction) => {
+      expect(dispatchedAction).toEqual(workerBehavior(action));
+    };
+
+    const makeNext = (action) => (newAction) => {
+      expect(newAction).toEqual(action);
+      setTimeout(() => { done(); }, 10);
     };
 
     const next = makeNext(actionWithWorker);
 
     const middleware = createWorkerMiddleware(new window.Worker(workerBehavior));
-    middleware()(next)(actionWithWorker);
+    middleware({ dispatch: spyDispatch })(next)(actionWithWorker);
   });
 });
