@@ -35,9 +35,9 @@ const createWorkerMiddleware = (worker) => {
     return (action) => {
       if (action.meta && action.meta.WebWorker) {
         worker.postMessage(action);
-      } else {
-        return next(action);
       }
+      // always pass the action along to the next middleware
+      return next(action);
     };
   };
 };
