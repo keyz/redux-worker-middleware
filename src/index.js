@@ -21,23 +21,27 @@ const createWorkerMiddleware = (worker) => {
     the first argument is ({ dispatch, getState }) by default,
     but we don't actually need them for now.
   */
-  return () => (next) => {
+  return ({ dispatch }) => (next) => {
     if (!next) {
       console.error( // eslint-disable-line no-console
         'Fatal: worker middleware received no `next` action. Check your chain of middlewares.'
       );
     }
 
-    worker.onmessage = ({ data: action }) => { // eslint-disable-line no-param-reassign
-      next(action);
+    /*
+      when the worker posts a message back, dispatch the action with its payload
+      so that it will go through the entire middleware chain
+    */
+    worker.onmessage = ({ data: resultAction }) => { // eslint-disable-line no-param-reassign
+      dispatch(resultAction);
     };
 
     return (action) => {
       if (action.meta && action.meta.WebWorker) {
         worker.postMessage(action);
-      } else {
-        return next(action);
       }
+      // always pass the action along to the next middleware
+      return next(action);
     };
   };
 };
