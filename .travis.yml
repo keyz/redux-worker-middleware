@@ -18,7 +18,4 @@ addons:
       - clang-3.6
       - g++-4.8
 
-before_install:
-  - npm install -g babel-cli
-
-after_success: npm run cov
+after_success: npm run coveralls

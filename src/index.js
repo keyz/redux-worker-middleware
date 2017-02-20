@@ -8,26 +8,16 @@ const createWorkerMiddleware = (worker) => {
   */
 
   if (!worker) {
-    console.error( // eslint-disable-line no-console
-      'Fatal: `worker` is falsy.'
+    throw new Error(
+      `\`createWorkerMiddleware\` expects a worker instance as the argument. Instead received: ${worker}`,
     );
   } else if (!worker.postMessage) {
-    console.error( // eslint-disable-line no-console
-      'Fatal: `worker` doesn\'t have a `postMessage` method.'
+    throw new Error(
+      'The worker instance is expected to have a `postMessage` method.',
     );
   }
 
-  /*
-    the first argument is ({ dispatch, getState }) by default,
-    but we don't actually need them for now.
-  */
-  return ({ dispatch }) => (next) => {
-    if (!next) {
-      console.error( // eslint-disable-line no-console
-        'Fatal: worker middleware received no `next` action. Check your chain of middlewares.'
-      );
-    }
-
+  return ({ dispatch }) => {
     /*
       when the worker posts a message back, dispatch the action with its payload
       so that it will go through the entire middleware chain
@@ -36,12 +26,20 @@ const createWorkerMiddleware = (worker) => {
       dispatch(resultAction);
     };
 
-    return (action) => {
-      if (action.meta && action.meta.WebWorker) {
-        worker.postMessage(action);
+    return (next) => {
+      if (!next) {
+        throw new Error(
+          'Worker middleware received no `next` action. Check your chain of middlewares.',
+        );
       }
-      // always pass the action along to the next middleware
-      return next(action);
+
+      return (action) => {
+        if (action.meta && action.meta.WebWorker) {
+          worker.postMessage(action);
+        }
+        // always pass the action along to the next middleware
+        return next(action);
+      };
     };
   };
 };
