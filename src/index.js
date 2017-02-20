@@ -9,22 +9,18 @@ const createWorkerMiddleware = (worker) => {
 
   if (!worker) {
     console.error( // eslint-disable-line no-console
-      'Fatal: `worker` is falsy.'
+      'Fatal: `worker` is falsy.',
     );
   } else if (!worker.postMessage) {
     console.error( // eslint-disable-line no-console
-      'Fatal: `worker` doesn\'t have a `postMessage` method.'
+      'Fatal: `worker` doesn\'t have a `postMessage` method.',
     );
   }
 
-  /*
-    the first argument is ({ dispatch, getState }) by default,
-    but we don't actually need them for now.
-  */
   return ({ dispatch }) => (next) => {
     if (!next) {
       console.error( // eslint-disable-line no-console
-        'Fatal: worker middleware received no `next` action. Check your chain of middlewares.'
+        'Fatal: worker middleware received no `next` action. Check your chain of middlewares.',
       );
     }
 
