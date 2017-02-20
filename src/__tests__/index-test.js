@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import createWorkerMiddleware from '..';
 
 class Worker {
@@ -45,29 +44,23 @@ describe('createWorkerMiddleware', () => {
     dispatch.mockClear();
   });
 
-  it('should yell if `worker` is falsy', () => {
-    spyOn(console, 'error');
-
-    createWorkerMiddleware();
-
-    expect(console.error).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledWith(
-      'Fatal: `worker` is falsy.',
+  it('should throw if `worker` is falsy', () => {
+    expect(() => {
+      createWorkerMiddleware();
+    }).toThrow(
+      '`createWorkerMiddleware` expects a worker instance as the argument. Instead received: undefined',
     );
   });
 
-  it('should yell if `worker.postMessage` is falsy', () => {
-    spyOn(console, 'error');
-
-    createWorkerMiddleware({});
-
-    expect(console.error).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledWith(
-      'Fatal: `worker` doesn\'t have a `postMessage` method.',
+  it('should throw if `worker.postMessage` is falsy', () => {
+    expect(() => {
+      createWorkerMiddleware({});
+    }).toThrow(
+      'The worker instance is expected to have a `postMessage` method.',
     );
   });
 
-  it('the worker must be invoked if the action needs it', (done) => {
+  it('the worker should be invoked if the action needs it', (done) => {
     const mockWorkerBehavior = jest.fn();
     const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior));
 
@@ -129,7 +122,7 @@ describe('createWorkerMiddleware', () => {
   });
 
   it('when the action needs a worker, it should still pass along the action with ' +
-     '`next`, and it should dispatch the action returned from the worker', (done) => {
+     '`next`, and it should `dispatch` the action returned from the worker', (done) => {
     const actionFromWorker = {
       type: 'WORKER_RETURN',
       payload: {

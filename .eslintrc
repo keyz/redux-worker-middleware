@@ -5,6 +5,5 @@
     "node": true,
     "es6": true,
     "jest": true,
-    "jasmine": true,
   },
 }

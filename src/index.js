@@ -8,19 +8,19 @@ const createWorkerMiddleware = (worker) => {
   */
 
   if (!worker) {
-    console.error( // eslint-disable-line no-console
-      'Fatal: `worker` is falsy.',
+    throw new Error(
+      `\`createWorkerMiddleware\` expects a worker instance as the argument. Instead received: ${worker}`,
     );
   } else if (!worker.postMessage) {
-    console.error( // eslint-disable-line no-console
-      'Fatal: `worker` doesn\'t have a `postMessage` method.',
+    throw new Error(
+      'The worker instance is expected to have a `postMessage` method.',
     );
   }
 
   return ({ dispatch }) => (next) => {
     if (!next) {
-      console.error( // eslint-disable-line no-console
-        'Fatal: worker middleware received no `next` action. Check your chain of middlewares.',
+      throw new Error(
+        'Worker middleware received no `next` action. Check your chain of middlewares.',
       );
     }
 
