@@ -1,6 +1,6 @@
 {
   "name": "redux-worker-middleware",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Organized Web Workers for Redux",
   "main": "lib/index.js",
   "files": [
@@ -53,7 +53,9 @@
     "rimraf": "^2.6.0"
   },
   "jest": {
-    "collectCoverageFrom": ["src/**/*.js"],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
     "testEnvironment": "node"
   }
 }
