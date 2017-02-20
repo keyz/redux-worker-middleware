@@ -17,13 +17,7 @@ const createWorkerMiddleware = (worker) => {
     );
   }
 
-  return ({ dispatch }) => (next) => {
-    if (!next) {
-      throw new Error(
-        'Worker middleware received no `next` action. Check your chain of middlewares.',
-      );
-    }
-
+  return ({ dispatch }) => {
     /*
       when the worker posts a message back, dispatch the action with its payload
       so that it will go through the entire middleware chain
@@ -32,12 +26,20 @@ const createWorkerMiddleware = (worker) => {
       dispatch(resultAction);
     };
 
-    return (action) => {
-      if (action.meta && action.meta.WebWorker) {
-        worker.postMessage(action);
+    return (next) => {
+      if (!next) {
+        throw new Error(
+          'Worker middleware received no `next` action. Check your chain of middlewares.',
+        );
       }
-      // always pass the action along to the next middleware
-      return next(action);
+
+      return (action) => {
+        if (action.meta && action.meta.WebWorker) {
+          worker.postMessage(action);
+        }
+        // always pass the action along to the next middleware
+        return next(action);
+      };
     };
   };
 };
