@@ -147,4 +147,95 @@ describe('createWorkerMiddleware', () => {
 
     middleware({ dispatch })(next)(actionWithWorker);
   });
+
+  it('when the action needs a worker, it should still pass along the action with ' +
+    '`next`, and it should `dispatch` the action returned from the worker ' +
+    'properly parsed if configured to receive strings', (done) => {
+    const actionFromWorker = {
+      type: 'WORKER_RETURN',
+      payload: {
+        data: 100,
+      },
+    };
+
+    const mockWorkerBehavior = jest.fn(() => JSON.stringify(actionFromWorker));
+    const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
+      receiveString: true
+    });
+
+    const next = (action) => {
+      expect(action).toBe(actionWithWorker);
+      setTimeout(() => {
+        expect(mockWorkerBehavior).toHaveBeenCalledTimes(1);
+        expect(mockWorkerBehavior).toHaveBeenCalledWith(actionWithWorker);
+
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(actionFromWorker);
+        done();
+      }, 10);
+    };
+
+    middleware({ dispatch })(next)(actionWithWorker);
+  });
+
+  it('when the action needs a worker, it should still pass along the action with ' +
+    '`next`, and it should `dispatch` the action returned from the worker ' +
+    'normally even when it sends strings', (done) => {
+    const actionFromWorker = {
+      type: 'WORKER_RETURN',
+      payload: {
+        data: 100,
+      },
+    };
+
+    const mockWorkerBehavior = jest.fn(() => actionFromWorker);
+    const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
+      sendString: true
+    });
+
+    const next = (action) => {
+      expect(action).toBe(actionWithWorker);
+      setTimeout(() => {
+        expect(mockWorkerBehavior).toHaveBeenCalledTimes(1);
+        expect(mockWorkerBehavior).toHaveBeenCalledWith(JSON.stringify(actionWithWorker));
+
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(actionFromWorker);
+        done();
+      }, 10);
+    };
+
+    middleware({ dispatch })(next)(actionWithWorker);
+  });
+
+  it('when the action needs a worker, it should still pass along the action with ' +
+    '`next`, and it should `dispatch` the action returned from the worker ' +
+    'normally even when it sends strings and parses strings', (done) => {
+    const actionFromWorker = {
+      type: 'WORKER_RETURN',
+      payload: {
+        data: 100,
+      },
+    };
+
+    const mockWorkerBehavior = jest.fn(() => JSON.stringify(actionFromWorker));
+    const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
+      sendString: true,
+      receiveString: true
+    });
+
+    const next = (action) => {
+      expect(action).toBe(actionWithWorker);
+      setTimeout(() => {
+        expect(mockWorkerBehavior).toHaveBeenCalledTimes(1);
+        expect(mockWorkerBehavior).toHaveBeenCalledWith(JSON.stringify(actionWithWorker));
+
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(actionFromWorker);
+        done();
+      }, 10);
+    };
+
+    middleware({ dispatch })(next)(actionWithWorker);
+  });
 });
