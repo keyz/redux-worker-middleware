@@ -160,7 +160,7 @@ describe('createWorkerMiddleware', () => {
 
     const mockWorkerBehavior = jest.fn(() => JSON.stringify(actionFromWorker));
     const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
-      receiveString: true
+      receiveString: true,
     });
 
     const next = (action) => {
@@ -190,7 +190,7 @@ describe('createWorkerMiddleware', () => {
 
     const mockWorkerBehavior = jest.fn(() => actionFromWorker);
     const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
-      sendString: true
+      sendString: true,
     });
 
     const next = (action) => {
@@ -221,7 +221,7 @@ describe('createWorkerMiddleware', () => {
     const mockWorkerBehavior = jest.fn(() => JSON.stringify(actionFromWorker));
     const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), {
       sendString: true,
-      receiveString: true
+      receiveString: true,
     });
 
     const next = (action) => {
