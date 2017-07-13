@@ -1,4 +1,29 @@
-const createWorkerMiddleware = (worker) => {
+const plainSender = (worker, action, next) => {
+  if (action.meta && action.meta.WebWorker) {
+    worker.postMessage(action);
+  }
+  return next(action);
+};
+
+const stringSender = (worker, action, next) => {
+  if (action.meta && action.meta.WebWorker) {
+    worker.postMessage(JSON.stringify(action));
+  }
+  return next(action);
+};
+
+const plainReceiver = dispatch => ({ data: resultAction }) => {
+  dispatch(resultAction);
+};
+
+const stringReceiver = dispatch => ({ data: string }) => {
+  dispatch(JSON.parse(string));
+};
+
+const createWorkerMiddleware = (worker, {
+  sendString = false,
+  receiveString = false,
+} = {}) => {
   /*
     for now, we don't really care if you actually pass it a Worker instance; as long as
     it look likes a Worker and works like a Worker (has a `postMessage` method), it _is_ a Worker.
@@ -17,14 +42,15 @@ const createWorkerMiddleware = (worker) => {
     );
   }
 
+  const sender = sendString ? stringSender : plainSender;
+
   return ({ dispatch }) => {
     /*
       when the worker posts a message back, dispatch the action with its payload
       so that it will go through the entire middleware chain
     */
-    worker.onmessage = ({ data: resultAction }) => { // eslint-disable-line no-param-reassign
-      dispatch(resultAction);
-    };
+    // eslint-disable-next-line no-param-reassign
+    worker.onmessage = receiveString ? stringReceiver(dispatch) : plainReceiver(dispatch);
 
     return (next) => {
       if (!next) {
@@ -33,13 +59,7 @@ const createWorkerMiddleware = (worker) => {
         );
       }
 
-      return (action) => {
-        if (action.meta && action.meta.WebWorker) {
-          worker.postMessage(action);
-        }
-        // always pass the action along to the next middleware
-        return next(action);
-      };
+      return action => sender(worker, action, next);
     };
   };
 };

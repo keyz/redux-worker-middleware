@@ -1,3 +1,7 @@
+## 1.1.0 (July 11, 2017)
+
+* Options to send and receive strings (for performance and predictability): More [here](https://nolanlawson.com/2016/02/29/high-performance-web-worker-messages/)
+
 ## 1.0.0 (February 19, 2017)
 
 * Bugfix: pass along all actions to next middleware in chain. ([@jebeck](https://github.com/jebeck) in [#5](https://github.com/keyanzhang/redux-worker-middleware/pull/5))

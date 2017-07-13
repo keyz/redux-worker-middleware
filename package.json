@@ -1,6 +1,6 @@
 {
   "name": "redux-worker-middleware",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Organized Web Workers for Redux",
   "main": "lib/index.js",
   "files": [
@@ -57,5 +57,6 @@
       "src/**/*.js"
     ],
     "testEnvironment": "node"
-  }
+  },
+  "dependencies": {}
 }
