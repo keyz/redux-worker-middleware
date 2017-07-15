@@ -122,11 +122,14 @@ describe('createWorkerMiddleware', () => {
   });
 
   it('when the action needs a worker, it should still pass along the action with ' +
-     '`next`, and it should `dispatch` the action returned from the worker', (done) => {
+     '`next`, and it should `dispatch` the action returned from the worker after the worker has set the `WebWorker` to be false to prevent inifite loop', (done) => {
     const actionFromWorker = {
       type: 'WORKER_RETURN',
       payload: {
         data: 100,
+      },
+      meta: {
+        WebWorker: false,
       },
     };
 
