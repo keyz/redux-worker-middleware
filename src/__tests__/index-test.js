@@ -130,7 +130,7 @@ describe('createWorkerMiddleware', () => {
       },
       meta: {
         WebWorker: false,
-      }
+      },
     };
 
     const mockWorkerBehavior = jest.fn(() => actionFromWorker);
