@@ -23,6 +23,9 @@ const createWorkerMiddleware = (worker) => {
       so that it will go through the entire middleware chain
     */
     worker.onmessage = ({ data: resultAction }) => { // eslint-disable-line no-param-reassign
+      // Prevents from an infinite loop after the worker was done with the action
+      resultAction.meta.WebWorker = false;
+      
       dispatch(resultAction);
     };
 
