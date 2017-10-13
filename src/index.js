@@ -1,4 +1,4 @@
-const createWorkerMiddleware = (worker) => {
+const createWorkerMiddleware = (worker, workerName) => {
   /*
     for now, we don't really care if you actually pass it a Worker instance; as long as
     it look likes a Worker and works like a Worker (has a `postMessage` method), it _is_ a Worker.
@@ -34,7 +34,11 @@ const createWorkerMiddleware = (worker) => {
       }
 
       return (action) => {
-        if (action.meta && action.meta.WebWorker) {
+        if (
+          action.meta &&
+          (typeof workerName !== 'undefined'
+           ? action.meta.WebWorker === workerName
+           : action.meta.WebWorker === true)) {
           worker.postMessage(action);
         }
         // always pass the action along to the next middleware
