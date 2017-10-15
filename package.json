@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Organized Web Workers for Redux",
   "main": "lib/index.js",
+  "types": "./redux-worker-middleware.d.ts",
   "files": [
     "lib"
   ],
