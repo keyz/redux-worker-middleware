@@ -30,6 +30,17 @@ describe('createWorkerMiddleware', () => {
     },
   };
 
+  const actionWithNamedWorker = {
+    type: 'I_USE_NAMED_WORKER',
+    meta: {
+      WebWorker: 'worker',
+    },
+    payload: {
+      data: 42,
+      category: 'life',
+    },
+  };
+
   const actionWithoutWorker = {
     type: 'I_DONT_USE_WORKER',
     payload: {
@@ -146,5 +157,63 @@ describe('createWorkerMiddleware', () => {
     };
 
     middleware({ dispatch })(next)(actionWithWorker);
+  });
+
+  describe('when middleware uses unnamed worker', () => {
+    describe('when action meta contains the explicit worker name', () => {
+      const inputAction = actionWithNamedWorker;
+
+      it('does not invoke the worker', (done) => {
+        const mockWorkerBehavior = jest.fn();
+        const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior));
+
+        const next = (action) => {
+          expect(action).toBe(actionWithNamedWorker);
+          setTimeout(() => {
+            expect(mockWorkerBehavior).toHaveBeenCalledTimes(0);
+            done();
+          }, 10);
+        };
+
+        middleware({ dispatch })(next)(inputAction);
+      });
+    });
+  });
+
+  describe('when middleware is created for a named worker', () => {
+    describe('when worker name matches', () => {
+      it('invokes the worker', (done) => {
+        const mockWorkerBehavior = jest.fn();
+        const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), 'worker');
+
+        const next = (action) => {
+          expect(action).toBe(actionWithNamedWorker);
+          setTimeout(() => {
+            expect(mockWorkerBehavior).toHaveBeenCalledTimes(1);
+            expect(mockWorkerBehavior).toHaveBeenCalledWith(actionWithNamedWorker);
+            done();
+          }, 10);
+        };
+
+        middleware({ dispatch })(next)(actionWithNamedWorker);
+      });
+    });
+
+    describe('when worker name does not match', () => {
+      it('does not invoke the worker', (done) => {
+        const mockWorkerBehavior = jest.fn();
+        const middleware = createWorkerMiddleware(new Worker(mockWorkerBehavior), 'worker');
+
+        const next = (action) => {
+          expect(action).toBe(actionWithWorker);
+          setTimeout(() => {
+            expect(mockWorkerBehavior).toHaveBeenCalledTimes(0);
+            done();
+          }, 10);
+        };
+
+        middleware({ dispatch })(next)(actionWithWorker);
+      });
+    });
   });
 });

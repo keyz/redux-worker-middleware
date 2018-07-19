@@ -57,6 +57,16 @@ export const add1Action = (n) => ({
     num: n,
   },
 });
+
+export const add1ActionWithName = (n) => ({
+  type: 'ADD_1',
+  meta: {
+    WebWorker: "named-worker", // This line specifies the exact name of the worker which should handle this action
+  },
+  payload: {
+    num: n,
+  },
+});
 ```
 
 Then in your store configuration,
@@ -73,12 +83,17 @@ import {
 const Add1Worker = require('worker!../workers/Add1Worker'); // webpack's worker-loader
 const add1Worker = new Add1Worker;
 
+// This unnamed worker will handle all actions with `meta: { WebWorker: true }`
 const workerMiddleware = createWorkerMiddleware(add1Worker);
+
+// This named worker will handle all actions with `meta: { WebWorker: "named-worker" }`
+const namedWorkerMiddleware = createWorkerMiddleware(add1Worker, "named-worker");
 
 const rootReducer = combineReducers(reducers);
 
 const createStoreWithMiddleware = applyMiddleware(
   workerMiddleware,
+  namedWorkerMiddleware,
   thunk,
   logger,
 )(createStore);
