@@ -1,4 +1,18 @@
-const createWorkerMiddleware = (worker, workerName) => {
+const identity = x => x;
+
+const defaultOptions = {
+  deserialize: identity,
+  serialize: identity,
+};
+
+const createWorkerMiddleware = (
+  worker,
+  workerName,
+  {
+    deserialize = identity,
+    serialize = identity,
+  } = defaultOptions,
+) => {
   /*
     for now, we don't really care if you actually pass it a Worker instance; as long as
     it look likes a Worker and works like a Worker (has a `postMessage` method), it _is_ a Worker.
@@ -23,7 +37,7 @@ const createWorkerMiddleware = (worker, workerName) => {
       so that it will go through the entire middleware chain
     */
     worker.onmessage = ({ data: resultAction }) => { // eslint-disable-line no-param-reassign
-      dispatch(resultAction);
+      dispatch(deserialize(resultAction));
     };
 
     return (next) => {
@@ -39,7 +53,7 @@ const createWorkerMiddleware = (worker, workerName) => {
           (typeof workerName !== 'undefined'
            ? action.meta.WebWorker === workerName
            : action.meta.WebWorker === true)) {
-          worker.postMessage(action);
+          worker.postMessage(serialize(action));
         }
         // always pass the action along to the next middleware
         return next(action);
